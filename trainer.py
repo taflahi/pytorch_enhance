@@ -4,7 +4,7 @@ import network
 import time
 import torch
 import torch.optim as optim
-import args
+import argv
 import sys
 
 dataloader.args['train_scales'] = 2
@@ -158,7 +158,7 @@ def train(enhancer, mode, param):
 
 if __name__ == '__main__':
 
-    if len(args) < 2:
+    if len(argv) < 2:
         sys.exit()
 
     enhancer = network.Enhancer()
@@ -166,7 +166,7 @@ if __name__ == '__main__':
         enhancer = enhancer.cuda()
 
     # pretrain network
-    if args[1] == 'pretrain':
+    if argv[1] == 'pretrain':
         train(enhancer, 'pretrain', pretrain_params)
 
     # train network
