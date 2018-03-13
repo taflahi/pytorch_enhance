@@ -6,6 +6,7 @@ import torch
 import torch.optim as optim
 import args
 import sys
+import custom_adam as cadam
 
 dataloader.args['train_scales'] = 2
 dataloader.args['batch_size'] = 15
@@ -84,8 +85,7 @@ def train(enhancer, mode, param):
                 disc.zero_grad()
 
                 # optimizer for discriminator
-                opt_disc = optim.Adam(disc.parameters(), lr=l_r)
-                opt_disc.state['step'] = epoch * param['epochs'] + step
+                opt_disc = cadam.Adam(disc.parameters(), lr=l_r)
 
                 # output of new cloned network (maybe you can assert it to
                 # equal disc_out)
@@ -120,7 +120,8 @@ def train(enhancer, mode, param):
                 disc_loss.backward()
 
                 opt_gen.step()
-                opt_disc.step()
+                # cadam step
+                opt_disc.step(step_number=(epoch * param['epochs'] + step))
 
                 # rebuild real discriminator from clone
                 enhancer.assign_back_discriminator(disc)
