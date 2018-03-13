@@ -92,7 +92,9 @@ def train(enhancer, mode, param):
                 # output of new cloned network (maybe you can assert it to
                 # equal disc_out)
                 disc_out2 = disc(c12.detach(), c22.detach(), c32.detach())
-                disc_out_mean = disc_out2.sum(1).sum(1).sum(1).data.numpy()
+                disc_out_mean = disc_out2.sum(1).sum(1).sum(1).data.cpu().numpy(
+                ) if torch.cuda.is_available() else disc_out2.sum(1).sum(1).sum(1).data.numpy()
+
                 stats = stats + disc_out_mean if stats is not None else disc_out_mean
 
                 # compute generator loss
@@ -109,11 +111,14 @@ def train(enhancer, mode, param):
                 disc_loss = network.loss_discriminator(
                     disc_out2[:param['batch-size']], disc_out2[param['batch-size']:])
 
-                total = total + gen_loss.data.numpy() if total is not None else gen_loss.data.numpy()
+                gen_loss_data = gen_loss.data.cpu().numpy(
+                ) if torch.cuda.is_available() else gen_loss.data.numpy()
 
-                average = gen_loss.data.numpy() if average is None else average * \
-                    0.95 + 0.05 * gen_loss.data.numpy()
-                print('↑' if gen_loss.data.numpy() >
+                total = total + gen_loss_data if total is not None else gen_loss_data
+
+                average = gen_loss_data if average is None else average * \
+                    0.95 + 0.05 * gen_loss_data
+                print('↑' if gen_loss_data >
                       average else '↓', end='', flush=True)
 
                 # update parameters step
