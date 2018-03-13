@@ -79,9 +79,6 @@ class LambdaLayer(nn.Module):
 
         self.lambd = lambd
 
-        if torch.cuda.is_available():
-            self.lambd = self.lambd.cuda()
-
     def forward(self, input):
         return self.lambd(input)
 
