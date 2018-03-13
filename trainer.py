@@ -126,7 +126,7 @@ def train(enhancer, mode, param):
                 gen_loss.backward()
                 disc_loss.backward()
 
-                clip_grad_norm(disc.parameters(), 5)
+                torch.nn.utils.clip_grad_norm(disc.parameters(), 5)
 
                 opt_gen.step()
                 opt_disc.step()
