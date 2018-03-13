@@ -171,3 +171,4 @@ if __name__ == '__main__':
         train(enhancer, 'train', train_params)
 
 # load to cpu --> torch.load('model/model_train.pt', map_location={'cuda:0': 'cpu'})
+# for inference, do something like enhancer = network.Enhancer(64)

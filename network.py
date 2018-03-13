@@ -175,12 +175,12 @@ def decay_learning_rate(basic_lr, lr_period, lr_decay):
 
 # construct full network
 class Enhancer(nn.Module):
-    def __init__(self):
+    def __init__(self, discriminator_size=32):
         super(Enhancer, self).__init__()
         
         self.generator = Generator()
         self.perceptual = Perceptual()
-        self.discriminator = Discriminator(32)
+        self.discriminator = Discriminator(discriminator_size)
     
     def create_new_discriminator(self, size):
         self.discriminator = Discriminator(size)
