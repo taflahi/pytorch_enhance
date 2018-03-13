@@ -18,12 +18,12 @@ pretrain_params = {
     'smoothness-weight': 1e7,
     'adversary-weight': 0.0,
     'generator-start': 0,
-    'discriminator-start': 0,  # 1
-    'adversarial-start': 1,  # 2
+    'discriminator-start': 1,  # 1
+    'adversarial-start': 2,  # 2
     'perceptual-weight': 1e0,
-    'epochs': 2,  # 50
-    'epoch-size': 2,  # 72
-    'batch-size': 1,  # 15
+    'epochs': 50,  # 50
+    'epoch-size': 72,  # 72
+    'batch-size': 15,  # 15
     'image-size': 192,
     'zoom': 2,
     'learning-rate': 1e-4,
