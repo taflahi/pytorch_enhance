@@ -49,6 +49,9 @@ train_params = {
 
 
 def train(enhancer, mode, param):
+	# initial discriminator
+	disc = enhancer.discriminator_clone()
+
     seed_size = param['image-size'] // param['zoom']
     images = np.zeros(
         (param['batch-size'], 3, param['image-size'], param['image-size']), dtype=np.float32)
@@ -61,7 +64,6 @@ def train(enhancer, mode, param):
 
     # optimizer for generator
     opt_gen = optim.Adam(enhancer.generator.parameters(), lr=0)
-    opt_disc = optim.Adam(enhancer.generator.parameters(), lr=0)
 
     try:
         average, start = None, time.time()
@@ -83,6 +85,10 @@ def train(enhancer, mode, param):
 
                 # clone discriminator on the full network
                 disc = enhancer.discriminator_clone()
+                disc.zero_grad()
+                
+                # optimizer for discriminator
+                opt_disc = optim.Adam(disc.parameters(), lr = l_r)
 
                 # output of new cloned network (maybe you can assert it to
                 # equal disc_out)
