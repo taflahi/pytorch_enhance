@@ -50,9 +50,6 @@ train_params = {
 def train(enhancer, mode, param):
         # create initial discriminator
     disc = network.Discriminator(param['discriminator-size'])
-    if torch.cuda.is_available():
-        print('2. training in gpu')
-        disc = disc.cuda()
     assert disc.channels == enhancer.discriminator.channels
 
     seed_size = param['image-size'] // param['zoom']
@@ -165,8 +162,6 @@ if __name__ == '__main__':
 
     enhancer = network.Enhancer()
     if torch.cuda.is_available():
-        print('1. training in gpu')
-        enhancer = enhancer.cuda()
         torch.backends.cudnn.benchmark = True
 
     # pretrain network

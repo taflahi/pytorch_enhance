@@ -31,6 +31,9 @@ class ResidualBlockLayer(nn.Module):
         self.basic_layer = BasicLayer(
             input_channel, input_channel, 3, 1, 1, 0.1)
 
+        if torch.cuda.is_available():
+            self.basic_layer = self.basic_layer.cuda()
+
     def forward(self, input):
         x = self.basic_layer(input)
         return torch.add(input, x)
@@ -56,6 +59,9 @@ class Generator(nn.Module):
 
         self.output_layer = nn.Conv2d(64, 3, 7, padding=3)
 
+        if torch.cuda.is_available():
+            self.pixel_shuffle = self.pixel_shuffle.cuda()
+
     def forward(self, input):
         x = self.init_layer(input)
         for i in range(self.residual_size):
@@ -72,6 +78,9 @@ class LambdaLayer(nn.Module):
         super(LambdaLayer, self).__init__()
 
         self.lambd = lambd
+
+        if torch.cuda.is_available():
+            self.lambd = self.lambd.cuda()
 
     def forward(self, input):
         return self.lambd(input)
@@ -92,6 +101,10 @@ class Perceptual(nn.Module):
         # init with pretrained vgg19
         original = vgg.vgg19(pretrained=True)
         self.features = list(original.features.children())[:32]
+
+        if torch.cuda.is_available():
+            for i in range(len(self.features)):
+                self.features[i] = self.features[i].cuda()
 
     def forward(self, input):
         conv_1_2, conv_2_2, conv_3_2 = None, None, None
@@ -138,6 +151,13 @@ class Discriminator(nn.Module):
 
         self.batch_norm7 = nn.BatchNorm2d(2 * self.channels)
         self.conv_layer7 = nn.Conv2d(2 * self.channels, 1, 1)
+
+        if torch.cuda.is_available():
+            self.batch_norm1 = self.batch_norm1.cuda()
+            self.batch_norm2 = self.batch_norm2.cuda()
+            self.batch_norm3 = self.batch_norm3.cuda()
+            self.batch_norm7 = self.batch_norm7.cuda()
+            self.conv_layer7 = self.conv_layer7.cuda()
 
     def forward(self, conv_1_2, conv_2_2, conv_3_2):
         x1 = self.batch_norm1(conv_1_2)
