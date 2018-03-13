@@ -62,6 +62,7 @@ class Generator(nn.Module):
 
         if torch.cuda.is_available():
             self.pixel_shuffle = self.pixel_shuffle.cuda()
+            self.output_layer = self.output_layer.cuda()
 
     def forward(self, input):
         x = self.init_layer(input)
