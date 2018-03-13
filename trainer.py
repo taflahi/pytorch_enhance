@@ -49,9 +49,6 @@ train_params = {
 
 
 def train(enhancer, mode, param):
-	# initial discriminator
-	disc = enhancer.discriminator_clone()
-
     seed_size = param['image-size'] // param['zoom']
     images = np.zeros(
         (param['batch-size'], 3, param['image-size'], param['image-size']), dtype=np.float32)
@@ -74,7 +71,6 @@ def train(enhancer, mode, param):
 
             l_r = next(lr)
             network.update_optimizer_lr(opt_gen, l_r)
-            network.update_optimizer_lr(opt_disc, l_r)
 
             for _ in range(param['epoch-size']):
                 enhancer.zero_grad()
