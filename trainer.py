@@ -72,7 +72,7 @@ def train(enhancer, mode, param):
             l_r = next(lr)
             network.update_optimizer_lr(opt_gen, l_r)
 
-            for _ in range(param['epoch-size']):
+            for step in range(param['epoch-size']):
                 enhancer.zero_grad()
                 loader.copy(images, seeds)
 
@@ -82,9 +82,10 @@ def train(enhancer, mode, param):
                 # clone discriminator on the full network
                 disc = enhancer.discriminator_clone()
                 disc.zero_grad()
-                
+
                 # optimizer for discriminator
-                opt_disc = optim.Adam(disc.parameters(), lr = l_r)
+                opt_disc = optim.Adam(disc.parameters(), lr=l_r)
+                opt_disc.state['step'] = epoch * param['epochs'] + step
 
                 # output of new cloned network (maybe you can assert it to
                 # equal disc_out)
@@ -159,7 +160,7 @@ if __name__ == '__main__':
 
     enhancer = network.Enhancer()
     if torch.cuda.is_available():
-    	enhancer = enhancer.cuda()
+        enhancer = enhancer.cuda()
 
     # pretrain network
     if args[1] == 'pretrain':
