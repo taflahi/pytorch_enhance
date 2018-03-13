@@ -155,15 +155,19 @@ if __name__ == '__main__':
     if len(args) < 2:
         sys.exit()
 
+    enhancer = network.Enhancer()
+    if torch.cuda.is_available():
+    	enhancer = enhancer.cuda()
+
     # pretrain network
     if args[1] == 'pretrain':
-        enhancer = network.Enhancer()
-
         train(enhancer, 'pretrain', pretrain_params)
 
+    # train network
     else:
-        enhancer = network.Enhancer()
         enhancer.load_state_dict(torch.load('model/model_pretrain.pth'))
         enhancer.create_new_discriminator(64)
 
         train(enhancer, 'train', train_params)
+
+# load to cpu --> torch.load('model/model_train.pt', map_location={'cuda:0': 'cpu'})
