@@ -19,6 +19,10 @@ class BasicLayer(nn.Module):
                               kernel, stride=stride, padding=pad)
         self.prelu = nn.PReLU(init=alpha)
 
+        if torch.cuda.is_available():
+            self.conv = self.conv.cuda()
+            self.prelu = self.prelu.cuda()
+
     def forward(self, input):
         x = self.conv(input)
         return self.prelu(x)
@@ -30,9 +34,6 @@ class ResidualBlockLayer(nn.Module):
         super(ResidualBlockLayer, self).__init__()
         self.basic_layer = BasicLayer(
             input_channel, input_channel, 3, 1, 1, 0.1)
-
-        if torch.cuda.is_available():
-            self.basic_layer = self.basic_layer.cuda()
 
     def forward(self, input):
         x = self.basic_layer(input)
