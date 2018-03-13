@@ -8,7 +8,7 @@ import sys
 
 dataloader.args['train_scales'] = 2
 dataloader.args['batch_size'] = 15
-dataloader.args['train'] = 'data/*.jpg'
+dataloader.args['train'] = '../images/*.jpg'
 
 loader = dataloader.DataLoader()
 
@@ -48,8 +48,11 @@ train_params = {
 
 
 def train(enhancer, mode, param):
-	# create initial discriminator
+        # create initial discriminator
     disc = network.Discriminator(param['discriminator-size'])
+    if torch.cuda.is_available():
+        print('2. training in gpu')
+        disc = disc.cuda()
     assert disc.channels == enhancer.discriminator.channels
 
     seed_size = param['image-size'] // param['zoom']
@@ -64,7 +67,7 @@ def train(enhancer, mode, param):
 
     # optimizer for generator
     opt_gen = optim.Adam(enhancer.generator.parameters(), lr=0)
-    opt_disc = optim.Adam(disc.parameters(), lr = 0)
+    opt_disc = optim.Adam(disc.parameters(), lr=0)
 
     try:
         average, start = None, time.time()
@@ -88,7 +91,7 @@ def train(enhancer, mode, param):
 
                 # clone discriminator on the full network
                 enhancer.clone_discriminator_to(disc)
-          		
+
                 # output of new cloned network (maybe you can assert it to
                 # equal disc_out)
                 disc_out2 = disc(c12.detach(), c22.detach(), c32.detach())
@@ -162,7 +165,9 @@ if __name__ == '__main__':
 
     enhancer = network.Enhancer()
     if torch.cuda.is_available():
+        print('1. training in gpu')
         enhancer = enhancer.cuda()
+        torch.backends.cudnn.benchmark = True
 
     # pretrain network
     if sys.argv[1] == 'pretrain':
