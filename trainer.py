@@ -6,7 +6,6 @@ import torch
 import torch.optim as optim
 import args
 import sys
-import custom_adam as cadam
 
 dataloader.args['train_scales'] = 2
 dataloader.args['batch_size'] = 15
@@ -50,6 +49,10 @@ train_params = {
 
 
 def train(enhancer, mode, param):
+	# create initial discriminator
+    disc = network.Discriminator(param['discriminator-size'])
+    assert disc.channels == enhancer.discriminator.channels
+
     seed_size = param['image-size'] // param['zoom']
     images = np.zeros(
         (param['batch-size'], 3, param['image-size'], param['image-size']), dtype=np.float32)
@@ -62,6 +65,7 @@ def train(enhancer, mode, param):
 
     # optimizer for generator
     opt_gen = optim.Adam(enhancer.generator.parameters(), lr=0)
+    opt_disc = optim.Adam(disc.parameters(), lr = 0)
 
     try:
         average, start = None, time.time()
@@ -72,21 +76,20 @@ def train(enhancer, mode, param):
 
             l_r = next(lr)
             network.update_optimizer_lr(opt_gen, l_r)
+            network.update_optimizer_lr(opt_disc, l_r)
 
             for step in range(param['epoch-size']):
                 enhancer.zero_grad()
+                disc.zero_grad()
+
                 loader.copy(images, seeds)
 
                 # run full network once
                 gen_out, c12, c22, c32, c52, disc_out = enhancer(images, seeds)
 
                 # clone discriminator on the full network
-                disc = enhancer.discriminator_clone()
-                disc.zero_grad()
-
-                # optimizer for discriminator
-                opt_disc = cadam.Adam(disc.parameters(), lr=l_r)
-
+                enhancer.clone_discriminator_to(disc)
+          		
                 # output of new cloned network (maybe you can assert it to
                 # equal disc_out)
                 disc_out2 = disc(c12.detach(), c22.detach(), c32.detach())
@@ -120,8 +123,7 @@ def train(enhancer, mode, param):
                 disc_loss.backward()
 
                 opt_gen.step()
-                # cadam step
-                opt_disc.step(step_number=(epoch * param['epochs'] + step))
+                opt_disc.step()
 
                 # rebuild real discriminator from clone
                 enhancer.assign_back_discriminator(disc)

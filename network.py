@@ -195,16 +195,13 @@ class Enhancer(nn.Module):
         
         return gen_out, c12, c22, c32, perc_out, disc_out
     
-    def discriminator_clone(self):
-        disc = Discriminator(self.discriminator.channels)
+    def clone_discriminator_to(self, disc):
 
         mp = list(disc.parameters())
         mcp = list(self.discriminator.parameters())
         n = len(mp)
         for i in range(0, n):
             mp[i].data[:] = mcp[i].data[:]
-            
-        return disc
     
     def assign_back_discriminator(self, disc):
         mp = list(self.discriminator.parameters())
