@@ -171,12 +171,12 @@ if __name__ == '__main__':
 
     # pretrain network
     if sys.argv[1] == 'pretrain':
-    	print("Pretraining..")
+        print("Pretraining..")
         train(enhancer, 'pretrain', pretrain_params)
 
     # train network
     else:
-    	print("Training..")
+        print("Training..")
         enhancer.load_state_dict(torch.load('model/model_pretrain.pth'))
         enhancer.create_new_discriminator(64)
 
