@@ -94,6 +94,10 @@ class Perceptual(nn.Module):
                            dtype=np.float32).reshape((1, 3, 1, 1))
         self.offset = autograd.Variable(
             torch.from_numpy(offset_), requires_grad=False)
+
+        if torch.cuda.is_available():
+            self.offset = self.offset.cuda()
+
         self.lambd = lambd = LambdaLayer(
             lambda x: ((x + 0.5) * 255.0) - self.offset)
 
