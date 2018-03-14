@@ -94,8 +94,10 @@ def train(enhancer, mode, param):
                 # output of new cloned network (maybe you can assert it to
                 # equal disc_out)
                 disc_out2 = disc(c12.detach(), c22.detach(), c32.detach())
-                disc_out_mean = disc_out2.sum(1).sum(1).sum(1).data.cpu().numpy(
-                ) if torch.cuda.is_available() else disc_out2.sum(1).sum(1).sum(1).data.numpy()
+                disc_out_numpy = disc_out2.data.cpu().numpy(
+                ) if torch.cuda.is_available() else disc_out2.data.numpy()
+
+                disc_out_mean = np.mean(disc_out_numpy, axis=(1,2,3))
 
                 stats = stats + disc_out_mean if stats is not None else disc_out_mean
 
