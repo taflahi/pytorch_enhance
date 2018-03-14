@@ -146,7 +146,7 @@ class Discriminator(nn.Module):
             4 * self.input_channel, 3 * self.channels, 3, 1, 1)
 
         self.conv_layer4 = BasicLayer(
-            3 * self.input_channel, 4 * self.channels, 1, 1, 0)
+            6 * self.channels, 4 * self.channels, 1, 1, 0)
         self.conv_layer5 = BasicLayer(
             4 * self.channels, 3 * self.channels, 3, stride=2)
         self.conv_layer6 = BasicLayer(
