@@ -203,7 +203,7 @@ def loss_adversarial(input):
 
 
 def loss_discriminator(input, target):
-    return torch.mean(softminus(input) - F.softplus(target))
+    return torch.mean(softminus(target) - F.softplus(input))
 
 # decay learning rate
 
