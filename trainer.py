@@ -74,8 +74,10 @@ def train(enhancer, mode, param):
             total, stats = None, None
 
             l_r = next(lr)
-            network.update_optimizer_lr(opt_gen, l_r)
-            network.update_optimizer_lr(opt_disc, l_r)
+            if epoch >= param['generator-start']:
+                network.update_optimizer_lr(opt_gen, l_r)
+            if epoch >= param['discriminator-start']:
+                network.update_optimizer_lr(opt_disc, l_r)
 
             for step in range(param['epoch-size']):
                 enhancer.zero_grad()
@@ -101,11 +103,11 @@ def train(enhancer, mode, param):
                 if mode == 'pretrain':
                     gen_loss = network.loss_perceptual(c22[:param['batch-size']], c22[param['batch-size']:]) * param['perceptual-weight'] \
                         + network.loss_total_variation(gen_out) * param['smoothness-weight'] \
-                        + network.loss_adversarial(disc_out[1:]) * adversary_weight
+                        + network.loss_adversarial(disc_out[param['batch-size']:]) * adversary_weight
                 else:
                     gen_loss = network.loss_perceptual(c52[:param['batch-size']], c52[param['batch-size']:]) * param['perceptual-weight'] \
                         + network.loss_total_variation(gen_out) * param['smoothness-weight'] \
-                        + network.loss_adversarial(disc_out[1:]) * adversary_weight
+                        + network.loss_adversarial(disc_out[param['batch-size']:]) * adversary_weight
 
                 # compute discriminator loss
                 disc_loss = network.loss_discriminator(
